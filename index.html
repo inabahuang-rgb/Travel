@@ -1,0 +1,2278 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="tool">
+  <meta name="design-style" content="vitals">
+  <title>南山產物「金平安 PRO 6」保費試算與突發狀況理賠查閱</title>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Figtree:wght@500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* Page and surfaces (Vitals) */
+      --background: #ffffff;
+      --surface-container-low: #f1f7f8;
+      --surface-container: #e3f1f3;
+      --surface-container-high: #d5e9ec;
+
+      /* Text */
+      --on-surface: #1b2b33;
+      --on-surface-variant: #46585f;
+
+      /* Rules */
+      --outline: #7b9198;
+      --outline-variant: #d5e3e5;
+
+      /* Accents */
+      --primary: #0f7c8a;
+      --on-primary: #ffffff;
+      --primary-hover: #0b6370;
+      --primary-container: #e3f1f3;
+      --on-primary-container: #0a5560;
+      --secondary: #1d5e3a;
+      --tertiary: #2e7d4f;
+      --error: #b3261e;
+      --on-error: #ffffff;
+
+      /* Semantic & Data series */
+      --positive: #2e7d4f;
+      --warning: #b86e00;
+      --warning-bg: #fdf5e6;
+      --warning-text: #7a4800;
+      --error-bg: #fceeed;
+      --positive-bg: #e7f4ec;
+      --focus: #0f7c8a;
+
+      --data-1: #0f7c8a;
+      --data-2: #2e7d4f;
+      --data-3: #b86e00;
+      --data-4: #5c5fb0;
+      --data-context: #b8c7ca;
+
+      /* Fonts (Non-Latin TC first per design foundation) */
+      --font-headline: 'Noto Sans TC', 'Figtree', sans-serif;
+      --font-body: 'Noto Sans TC', 'Atkinson Hyperlegible', sans-serif;
+      --font-label: 'Noto Sans TC', 'Figtree', sans-serif;
+
+      /* Shape */
+      --rounded: 0.625rem;
+      --rounded-lg: 0.875rem;
+      --rounded-full: 9999px;
+
+      /* Style effects */
+      --top-bar: 6px solid var(--primary);
+      --status-bar-width: 4px;
+      --card-border: 1px solid var(--outline-variant);
+      --card-lift: 0 1px 2px color-mix(in srgb, var(--on-surface) 5%, transparent), 0 6px 16px color-mix(in srgb, var(--on-surface) 5%, transparent);
+
+      /* Type scale (Focused Tool) */
+      --display-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
+      --headline-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+      --subhead-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+      --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+      --label-size: 0.75rem;
+
+      /* Spacing scale (4pt base) */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--surface-container-low);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page-shell {
+      border-top: var(--top-bar);
+      min-height: 100vh;
+    }
+
+    .page-grid {
+      display: grid;
+      gap: var(--space-xl);
+      padding: var(--space-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Header & Title Block */
+    .hero-header {
+      background: var(--background);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg) var(--space-xl);
+      box-shadow: var(--card-lift);
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: center;
+    }
+
+    .kicker-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    .title {
+      font-family: var(--font-headline);
+      font-weight: 800;
+      font-size: var(--display-size);
+      line-height: 1.15;
+      letter-spacing: -0.015em;
+      color: var(--on-surface);
+      margin: 0;
+    }
+
+    .lede {
+      font-size: 1.02rem;
+      line-height: 1.65;
+      color: var(--on-surface-variant);
+      max-width: 65ch;
+      margin: var(--space-sm) 0 0 0;
+    }
+
+    .quick-nav {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      background: var(--surface-container-low);
+      border: var(--card-border);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+    }
+
+    .quick-nav-title {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      color: var(--on-surface-variant);
+      margin: 0;
+    }
+
+    .nav-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    /* Buttons & Chips */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: 0.9375rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background-color var(--dur-micro) var(--ease-out),
+                  color var(--dur-micro) var(--ease-out),
+                  box-shadow var(--dur-micro) var(--ease-out),
+                  transform var(--dur-micro) var(--ease-out);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+    .btn-primary:active {
+      transform: translateY(1px);
+    }
+
+    .btn-outline {
+      background: var(--background);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+    .btn-outline:hover {
+      background: var(--surface-container-low);
+    }
+
+    .btn-ghost {
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      border-color: var(--outline-variant);
+    }
+    .btn-ghost:hover {
+      background: var(--surface-container);
+    }
+
+    .btn-sm {
+      min-height: 38px;
+      padding: var(--space-xs) var(--space-sm);
+      font-size: 0.875rem;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: var(--label-size);
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--rounded-full);
+      background: var(--positive-bg);
+      color: var(--secondary);
+      white-space: nowrap;
+    }
+    .chip[data-status="info"] {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .chip[data-status="warn"] {
+      background: var(--warning-bg);
+      color: var(--warning-text);
+    }
+    .chip[data-status="alert"] {
+      background: var(--error-bg);
+      color: var(--error);
+    }
+
+    /* Section Headings */
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+
+    .section-title {
+      font-family: var(--font-headline);
+      font-weight: 800;
+      font-size: var(--headline-size);
+      line-height: 1.2;
+      color: var(--on-surface);
+      margin: 0;
+    }
+
+    .section-desc {
+      color: var(--on-surface-variant);
+      margin: var(--space-xs) 0 0 0;
+      max-width: 65ch;
+      font-size: 0.95rem;
+    }
+
+    /* Calculator Layout */
+    .calc-workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.35fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--background);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--card-lift);
+    }
+
+    .panel-title {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: var(--subhead-size);
+      margin: 0 0 var(--space-md) 0;
+      color: var(--on-surface);
+    }
+
+    .preset-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-md);
+      border-bottom: var(--card-border);
+    }
+
+    .preset-btn {
+      min-height: 38px;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded-full);
+      border: 1px solid var(--outline-variant);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out),
+                  border-color var(--dur-micro) var(--ease-out);
+    }
+    .preset-btn:hover {
+      background: var(--surface-container);
+      border-color: var(--primary);
+    }
+    .preset-btn[aria-pressed="true"] {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .field-group.full-span {
+      grid-column: 1 / -1;
+    }
+
+    .field-label {
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 0.875rem;
+      color: var(--on-surface);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .field-hint {
+      font-size: 0.8125rem;
+      color: var(--on-surface-variant);
+      margin: 0;
+    }
+
+    .input-control, .select-control {
+      width: 100%;
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--outline);
+      border-radius: var(--rounded);
+      background: var(--background);
+      color: var(--on-surface);
+      font-size: 0.95rem;
+      transition: box-shadow var(--dur-micro) var(--ease-out),
+                  border-color var(--dur-micro) var(--ease-out);
+    }
+
+    .select-control {
+      padding-right: var(--space-xl);
+    }
+
+    .input-control:focus, .select-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent);
+      outline: none;
+    }
+
+    .input-control[aria-invalid="true"] {
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--error) 16%, transparent);
+    }
+
+    .plan-pills {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+
+    .plan-pill {
+      min-height: 48px;
+      padding: var(--space-xs) var(--space-sm);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded);
+      background: var(--background);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: background-color var(--dur-micro) var(--ease-out),
+                  box-shadow var(--dur-micro) var(--ease-out),
+                  border-color var(--dur-micro) var(--ease-out);
+    }
+    .plan-pill:hover {
+      background: var(--surface-container-low);
+      border-color: var(--primary);
+    }
+    .plan-pill[aria-pressed="true"] {
+      background: var(--primary-container);
+      border-color: var(--primary);
+      box-shadow: inset 0 0 0 1px var(--primary);
+    }
+    .plan-pill-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--on-surface);
+    }
+    .plan-pill[aria-pressed="true"] .plan-pill-name {
+      color: var(--on-primary-container);
+    }
+    .plan-pill-sub {
+      font-size: 0.75rem;
+      color: var(--on-surface-variant);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .error-banner {
+      display: none;
+      margin-top: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded);
+      background: var(--error-bg);
+      border-left: var(--status-bar-width) solid var(--error);
+      color: var(--error);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .error-banner.visible {
+      display: block;
+    }
+
+    /* Status Cards & Output Area */
+    .results-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+
+    .status-card {
+      background: var(--background);
+      border: var(--card-border);
+      border-left: var(--status-bar-width) solid var(--primary);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md) var(--space-lg);
+      transition: transform var(--dur-short) var(--ease-out);
+    }
+    .status-card[data-status="ok"] { border-left-color: var(--tertiary); }
+    .status-card[data-status="warn"] { border-left-color: var(--warning); }
+    .status-card[data-status="alert"] { border-left-color: var(--error); }
+
+    .kpi-label {
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      margin-bottom: var(--space-xs);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .kpi-value {
+      font-family: var(--font-headline);
+      font-weight: 800;
+      font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+      line-height: 1.15;
+      font-variant-numeric: tabular-nums;
+      color: var(--on-surface);
+      margin: 0;
+    }
+
+    .kpi-caption {
+      font-size: 0.85rem;
+      color: var(--on-surface-variant);
+      margin: var(--space-xs) 0 0 0;
+    }
+    .kpi-caption.is-ok { color: var(--secondary); font-weight: 600; }
+    .kpi-caption.is-warn { color: var(--warning-text); font-weight: 600; }
+    .kpi-caption.is-alert { color: var(--error); font-weight: 600; }
+
+    /* Callout & Target Band */
+    .callout {
+      background: var(--primary-container);
+      border-left: var(--status-bar-width) solid var(--primary);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md) var(--space-lg);
+      color: var(--on-primary-container);
+      font-size: 0.92rem;
+    }
+    .callout[data-status="warn"] {
+      background: var(--warning-bg);
+      border-left-color: var(--warning);
+      color: var(--warning-text);
+    }
+    .callout-title {
+      font-weight: 700;
+      margin: 0 0 var(--space-xs) 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    /* Breakdown Box */
+    .breakdown-panel {
+      background: var(--background);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md) var(--space-lg);
+    }
+
+    .breakdown-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-md);
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid var(--outline-variant);
+      font-size: 0.925rem;
+    }
+    .breakdown-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .breakdown-num {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--on-surface);
+      white-space: nowrap;
+    }
+
+    /* Multiplier Visual Band (Vitals treatment 5) */
+    .range-band-wrap {
+      margin-top: var(--space-sm);
+      background: var(--surface-container-low);
+      border-radius: var(--rounded);
+      padding: var(--space-sm) var(--space-md);
+    }
+    .range-bar-track {
+      position: relative;
+      height: 12px;
+      border-radius: var(--rounded-full);
+      background: var(--outline-variant);
+      overflow: hidden;
+      margin: var(--space-xs) 0;
+    }
+    .range-bar-target {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      background: color-mix(in srgb, var(--tertiary) 26%, transparent);
+    }
+    .range-bar-fill {
+      height: 100%;
+      border-radius: var(--rounded-full);
+      background: var(--primary);
+      transition: width var(--dur-short) var(--ease-out);
+    }
+
+    /* Rate Customizer Drawer */
+    .drawer-toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-top: var(--space-md);
+    }
+    .custom-rate-drawer {
+      display: none;
+      margin-top: var(--space-md);
+      padding-top: var(--space-md);
+      border-top: var(--card-border);
+    }
+    .custom-rate-drawer.open {
+      display: block;
+    }
+    .mini-input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Part 2: Timeline Schematic */
+    .timeline-card {
+      background: var(--background);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--card-lift);
+    }
+    .timeline-svg-wrap {
+      width: 100%;
+      overflow-x: auto;
+      padding-bottom: var(--space-xs);
+    }
+    .timeline-nodes {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-sm);
+      margin-top: var(--space-md);
+    }
+    .stage-btn {
+      text-align: left;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded);
+      border: 1px solid var(--outline-variant);
+      background: var(--surface-container-low);
+      cursor: pointer;
+      min-height: 44px;
+      transition: background-color var(--dur-micro) var(--ease-out),
+                  border-color var(--dur-micro) var(--ease-out);
+    }
+    .stage-btn:hover {
+      background: var(--surface-container);
+      border-color: var(--primary);
+    }
+    .stage-btn[aria-pressed="true"] {
+      background: var(--primary-container);
+      border-color: var(--primary);
+      box-shadow: inset 0 0 0 1px var(--primary);
+    }
+    .stage-btn-title {
+      display: block;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--on-surface);
+    }
+    .stage-btn-sub {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--on-surface-variant);
+      margin-top: var(--space-xs);
+    }
+
+    /* Claim Explorer Controls */
+    .explorer-controls {
+      background: var(--background);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-sm);
+      align-items: end;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .filter-chip {
+      min-height: 38px;
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--rounded-full);
+      border: 1px solid var(--outline-variant);
+      background: var(--background);
+      color: var(--on-surface);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out),
+                  border-color var(--dur-micro) var(--ease-out),
+                  color var(--dur-micro) var(--ease-out);
+    }
+    .filter-chip:hover {
+      background: var(--surface-container-low);
+      border-color: var(--primary);
+    }
+    .filter-chip[aria-pressed="true"] {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: var(--on-primary);
+    }
+
+    /* Scenario Cards Grid */
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+      gap: var(--space-lg);
+    }
+
+    .scenario-card {
+      background: var(--background);
+      border: var(--card-border);
+      border-left: var(--status-bar-width) solid var(--tertiary);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--card-lift);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    .scenario-card[data-status="warn"] { border-left-color: var(--warning); }
+    .scenario-card[data-status="alert"] { border-left-color: var(--error); }
+    .scenario-card[data-status="info"] { border-left-color: var(--primary); }
+
+    .scenario-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-sm);
+    }
+
+    .scenario-title {
+      font-family: var(--font-headline);
+      font-weight: 800;
+      font-size: 1.125rem;
+      line-height: 1.3;
+      color: var(--on-surface);
+      margin: 0;
+    }
+
+    .scenario-clause {
+      font-size: 0.8125rem;
+      color: var(--on-primary-container);
+      background: var(--primary-container);
+      display: inline-block;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded);
+      font-weight: 600;
+      margin-top: var(--space-xs);
+    }
+
+    .scenario-summary {
+      margin: 0;
+      color: var(--on-surface);
+      font-size: 0.94rem;
+    }
+
+    .scenario-block {
+      background: var(--surface-container-low);
+      border-radius: var(--rounded);
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.885rem;
+    }
+    .scenario-block-alert {
+      background: var(--error-bg);
+      color: var(--error);
+    }
+    .scenario-block-title {
+      font-weight: 700;
+      margin: 0 0 var(--space-xs) 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .scenario-list {
+      margin: 0;
+      padding-left: var(--space-lg);
+    }
+    .scenario-list li + li {
+      margin-top: var(--space-xs);
+    }
+
+    .scenario-footer {
+      margin-top: auto;
+      padding-top: var(--space-sm);
+      border-top: var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+    }
+
+    .bookmark-btn {
+      min-height: 38px;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded);
+      border: 1px solid var(--outline-variant);
+      background: var(--background);
+      color: var(--on-surface-variant);
+      font-size: 0.825rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .bookmark-btn[aria-pressed="true"] {
+      background: var(--positive-bg);
+      border-color: var(--tertiary);
+      color: var(--secondary);
+    }
+
+    /* Comparison Table */
+    .table-card {
+      background: var(--background);
+      border: var(--card-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+      font-size: 0.92rem;
+    }
+
+    thead th {
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      font-family: var(--font-label);
+      font-weight: 700;
+      text-align: left;
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 2px solid var(--outline-variant);
+    }
+
+    tbody td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--outline-variant);
+      vertical-align: top;
+      color: var(--on-surface);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .empty-state {
+      background: var(--background);
+      border: var(--card-border);
+      border-left: var(--status-bar-width) solid var(--outline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-xl);
+      text-align: left;
+    }
+
+    .source-footer {
+      border-top: var(--card-border);
+      padding-top: var(--space-lg);
+      color: var(--on-surface-variant);
+      font-size: 0.85rem;
+      line-height: 1.7;
+    }
+
+    /* Container & Responsive Breakpoints */
+    .card-wrapper { container-type: inline-size; }
+
+    @container (max-width: 440px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+      .plan-pills { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 900px) {
+      .hero-header { grid-template-columns: 1fr; }
+      .calc-workspace { grid-template-columns: 1fr; }
+      .timeline-nodes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .page-grid { padding: var(--space-md); gap: var(--space-lg); }
+      .hero-header, .panel, .timeline-card, .explorer-controls, .scenario-card {
+        padding: var(--space-md);
+      }
+      .form-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: 1fr; }
+      .plan-pills { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .timeline-nodes { grid-template-columns: 1fr; }
+      .search-row { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <main class="page-grid">
+
+      <!-- Opening Title Block -->
+      <header class="hero-header">
+        <div>
+          <div class="kicker-row">
+            <span class="chip" data-status="info">南山產物個人旅行綜合保險</span>
+            <span class="chip">條款依據：金平安6專案保單條款</span>
+          </div>
+          <h1 class="title">金平安 PRO 6 保費試算與突發狀況理賠查閱</h1>
+          <p class="lede">
+            輸入旅遊日期區間、出生年月日與計劃數，即可即時檢核投保年齡法規、海外醫療倍率與試算參考保費；下方同步彙整暴動、罷工、颱風天災、班機延誤與機件故障等常見情境之條款理賠攻略與除外地雷。
+          </p>
+        </div>
+        <div class="quick-nav">
+          <p class="quick-nav-title">快速前往功能區</p>
+          <div class="nav-btn-group">
+            <button type="button" class="btn btn-primary btn-sm" onclick="scrollToSection('calculator-section')">
+              <i data-lucide="calculator" aria-hidden="true"></i>
+              保費與年齡試算
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="scrollToSection('claims-section')">
+              <i data-lucide="shield-check" aria-hidden="true"></i>
+              突發狀況理賠查閱
+            </button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="scrollToSection('compare-section')">
+              <i data-lucide="git-compare" aria-hidden="true"></i>
+              取消 vs 更改對照
+            </button>
+          </div>
+          <p class="field-hint" id="saved-status-note">已備妥試算工具與 14 種突發情境對照。</p>
+        </div>
+      </header>
+
+      <!-- Section 1: Focused Calculator -->
+      <section id="calculator-section" aria-labelledby="calc-heading">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" id="calc-heading">保費試算與投保條件檢核</h2>
+            <p class="section-desc">
+              系統依出發日計算精確足歲與旅遊總天數，並套用條款第5條未滿15足歲喪葬費用限額檢核及海外地區醫療係數（100% / 200% / 300%）。
+            </p>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" id="reset-calc-btn" onclick="resetCalculator(this)">
+            <i data-lucide="rotate-ccw" aria-hidden="true"></i>
+            重設試算條件
+          </button>
+        </div>
+
+        <div class="calc-workspace">
+          <!-- Left: Inputs -->
+          <div class="panel card-wrapper">
+            <h3 class="panel-title">步驟 1：輸入旅程與被保險人資料</h3>
+
+            <div class="preset-strip" role="group" aria-label="常見旅程範本">
+              <button type="button" class="preset-btn" data-preset="jp-adult" onclick="applyPreset('jp-adult', this)" aria-pressed="true">日本東京 5日（成人）</button>
+              <button type="button" class="preset-btn" data-preset="us-adult" onclick="applyPreset('us-adult', this)" aria-pressed="false">美國紐約 10日（成人）</button>
+              <button type="button" class="preset-btn" data-preset="kr-child" onclick="applyPreset('kr-child', this)" aria-pressed="false">韓國 4日（未滿15足歲）</button>
+              <button type="button" class="preset-btn" data-preset="eu-senior" onclick="applyPreset('eu-senior', this)" aria-pressed="false">歐洲 12日（72歲長輩）</button>
+            </div>
+
+            <div class="form-grid">
+              <div class="field-group">
+                <label class="field-label" for="start-date">出發日期（含當日）</label>
+                <input type="date" id="start-date" class="input-control" oninput="handleInputChange()" onchange="handleInputChange()">
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="end-date">返國日期（含當日）</label>
+                <input type="date" id="end-date" class="input-control" oninput="handleInputChange()" onchange="handleInputChange()">
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="birth-date">被保險人出生年月日</label>
+                <input type="date" id="birth-date" class="input-control" oninput="handleInputChange()" onchange="handleInputChange()">
+                <p class="field-hint">依出發當日計算實足年齡</p>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="region-select">前往旅遊地區</label>
+                <select id="region-select" class="select-control" onchange="handleInputChange()">
+                  <option value="jp_kr_au_nz">日本、韓國、紐西蘭、澳大利亞（200%）</option>
+                  <option value="us_ca_eu">美國、加拿大、歐洲（300%）</option>
+                  <option value="other">其他海外地區：東南亞、港澳等（100%）</option>
+                </select>
+                <p class="field-hint">決定海外突發疾病醫療限額調整係數</p>
+              </div>
+
+              <div class="field-group full-span">
+                <label class="field-label" id="plan-label">選擇投保計劃數</label>
+                <div class="plan-pills" role="group" aria-labelledby="plan-label">
+                  <button type="button" class="plan-pill" data-plan="1" onclick="selectPlan(1)" aria-pressed="false">
+                    <span class="plan-pill-name">計劃一</span>
+                    <span class="plan-pill-sub" id="plan-sub-1">基礎型</span>
+                  </button>
+                  <button type="button" class="plan-pill" data-plan="2" onclick="selectPlan(2)" aria-pressed="false">
+                    <span class="plan-pill-name">計劃二</span>
+                    <span class="plan-pill-sub" id="plan-sub-2">標準型</span>
+                  </button>
+                  <button type="button" class="plan-pill" data-plan="3" onclick="selectPlan(3)" aria-pressed="true">
+                    <span class="plan-pill-name">計劃三</span>
+                    <span class="plan-pill-sub" id="plan-sub-3">進階型</span>
+                  </button>
+                  <button type="button" class="plan-pill" data-plan="4" onclick="selectPlan(4)" aria-pressed="false">
+                    <span class="plan-pill-name">計劃四</span>
+                    <span class="plan-pill-sub" id="plan-sub-4">高保障</span>
+                  </button>
+                  <button type="button" class="plan-pill" data-plan="5" onclick="selectPlan(5)" aria-pressed="false">
+                    <span class="plan-pill-name">計劃五</span>
+                    <span class="plan-pill-sub" id="plan-sub-5">旗艦型</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div id="calc-error" class="error-banner" role="alert"></div>
+
+            <!-- Transparent Custom Rate Drawer -->
+            <div class="drawer-toggle-row">
+              <span class="field-hint">持有實體 DM 費率表？可自行調整該計劃費率基準</span>
+              <button type="button" class="btn btn-ghost btn-sm" id="toggle-rate-drawer-btn" onclick="toggleRateDrawer()">
+                <i data-lucide="sliders-horizontal" aria-hidden="true"></i>
+                校準 DM 費率參數
+              </button>
+            </div>
+
+            <div class="custom-rate-drawer" id="custom-rate-drawer">
+              <p class="field-hint" style="margin-bottom: var(--space-sm);">
+                註：本專案提供之費率圖檔無可辨識數字明碼，下欄預載「示範級距費率」。您可依實際 DM 數字覆寫目前選定計劃（<strong id="drawer-plan-name">計劃三</strong>）之參數，系統將即時重算並記憶：
+              </p>
+              <div class="mini-input-grid">
+                <div class="field-group">
+                  <label class="field-label" for="custom-base-fee">5日內基本保費（元）</label>
+                  <input type="number" id="custom-base-fee" class="input-control" min="50" step="10" oninput="updateCustomRate()">
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="custom-daily-fee">第6日起每日加計（元）</label>
+                  <input type="number" id="custom-daily-fee" class="input-control" min="10" step="5" oninput="updateCustomRate()">
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="custom-add-sum">意外身故/失能保額（萬）</label>
+                  <input type="number" id="custom-add-sum" class="input-control" min="100" step="100" oninput="updateCustomRate()">
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="custom-med-base">突發疾病醫療基準（萬）</label>
+                  <input type="number" id="custom-med-base" class="input-control" min="10" step="10" oninput="updateCustomRate()">
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" onclick="restoreDefaultRates()">恢復示範預設級距</button>
+            </div>
+          </div>
+
+          <!-- Right: Live Answer & Work -->
+          <div class="results-stack card-wrapper">
+            <div class="kpi-grid">
+              <div class="status-card" id="card-premium" data-status="info">
+                <div class="kpi-label">
+                  <span>試算參考總保費（示範級距）</span>
+                  <span class="chip" data-status="info" id="chip-plan-badge">計劃三</span>
+                </div>
+                <p class="kpi-value" id="out-premium">NT$ 1,280</p>
+                <p class="kpi-caption" id="out-premium-sub">平均每日約 NT$ 256 / 人</p>
+              </div>
+
+              <div class="status-card" id="card-days" data-status="ok">
+                <div class="kpi-label">
+                  <span>旅遊天數與延長保障</span>
+                  <span class="chip" id="chip-days-badge">有效區間</span>
+                </div>
+                <p class="kpi-value" id="out-days">5 天 4 夜</p>
+                <p class="kpi-caption is-ok" id="out-days-sub">搭機延誤最高自動延長 +24 小時</p>
+              </div>
+
+              <div class="status-card" id="card-age" data-status="ok">
+                <div class="kpi-label">
+                  <span>出發日實足年齡與條款分級</span>
+                  <span class="chip" id="chip-age-badge">一般成人</span>
+                </div>
+                <p class="kpi-value" id="out-age">34 歲</p>
+                <p class="kpi-caption is-ok" id="out-age-sub">適用完整意外身故與失能保險金</p>
+              </div>
+
+              <div class="status-card" id="card-multiplier" data-status="ok">
+                <div class="kpi-label">
+                  <span>海外突發疾病調整係數</span>
+                  <span class="chip" id="chip-region-badge">200% 倍率</span>
+                </div>
+                <p class="kpi-value" id="out-med-limit">NT$ 200 萬</p>
+                <p class="kpi-caption" id="out-med-sub">基準 100 萬 × 200%（日韓紐澳）</p>
+              </div>
+            </div>
+
+            <!-- Age / Policy Rule Callout -->
+            <div class="callout" id="age-rule-callout" data-status="info">
+              <p class="callout-title" id="age-callout-title">
+                <i data-lucide="info" aria-hidden="true"></i>
+                條款檢核說明
+              </p>
+              <div id="age-callout-body">
+                被保險人於出發日已滿 15 足歲，適用主約第 5 條一般身故保險金與失能保險金約定。
+              </div>
+            </div>
+
+            <!-- Show your work: Calculation Breakdown + Multiplier Target Band -->
+            <div class="breakdown-panel">
+              <h3 class="panel-title">計算明細與保障基準對照</h3>
+              <ul class="breakdown-list" id="breakdown-list">
+                <li class="breakdown-row">
+                  <span>旅程日期區間（含頭尾共計）</span>
+                  <span class="breakdown-num" id="work-dates">—</span>
+                </li>
+                <li class="breakdown-row">
+                  <span>計劃與基準費率公式</span>
+                  <span class="breakdown-num" id="work-formula">—</span>
+                </li>
+                <li class="breakdown-row">
+                  <span>年齡核保與法規檢核（旅平險第 5 條）</span>
+                  <span class="breakdown-num" id="work-age-rule">—</span>
+                </li>
+                <li class="breakdown-row">
+                  <span>海外突發疾病限額（醫療附約附表）</span>
+                  <span class="breakdown-num" id="work-med-calc">—</span>
+                </li>
+              </ul>
+
+              <div class="range-band-wrap">
+                <div class="kpi-label" style="margin-bottom: 0;">
+                  <span>海外突發疾病地區倍率帶（100% 至 300%）</span>
+                  <span id="band-label-text">目前：200%</span>
+                </div>
+                <div class="range-bar-track" aria-hidden="true">
+                  <div class="range-bar-target" style="width: 100%;"></div>
+                  <div class="range-bar-fill" id="multiplier-bar-fill" style="width: 66.6%;"></div>
+                </div>
+                <p class="field-hint">
+                  美加歐洲可放大至 300%、日韓紐澳放大至 200%、其他地區維持 100%（需為保單生效前 180 日內未曾診療之突發疾病）。
+                </p>
+              </div>
+            </div>
+
+            <div class="callout" data-status="warn">
+              <p class="callout-title">
+                <i data-lucide="alert-circle" aria-hidden="true"></i>
+                試算數字透明度說明
+              </p>
+              <div>
+                保單條款規則、年齡限額（未滿15足歲喪葬費半數限額）、地區調整係數（100%/200%/300%）及理賠上限皆直接引自「金平安6專案_保單條款.pdf」；由於來源中之 DM 費率圖檔不含可解析數字文字，本工具之保費與計劃保額採可編輯示範級距，實際投保金額與保費請以南山產物正式報價單為準。
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Interactive Journey Risk Timeline + Claim Scenario Explorer -->
+      <section id="claims-section" aria-labelledby="claims-heading">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" id="claims-heading">突發狀況與社會狀況理賠查閱</h2>
+            <p class="section-desc">
+              遇到暴動、民眾騷擾、罷工、颱風天災、班機延誤或機件故障時，究竟能申請哪一項理賠？點選旅程階段或輸入關鍵字，立即比對承保條件、給付計算與除外地雷。
+            </p>
+          </div>
+          <span class="chip" data-status="info" id="bookmark-counter-chip">已收藏 0 項常用情境</span>
+        </div>
+
+        <!-- Journey Stage Timeline Schematic -->
+        <div class="timeline-card">
+          <h3 class="panel-title">依事件發生時點快速篩選保障範圍</h3>
+          <div class="timeline-svg-wrap">
+            <svg viewBox="0 0 920 110" width="100%" height="110" role="img" aria-label="金平安 PRO 6 旅程四階段保障時間軸" style="min-width: 620px; display: block;">
+              <line x1="60" y1="42" x2="860" y2="42" stroke="var(--outline-variant)" stroke-width="6" stroke-linecap="round" />
+              <line x1="60" y1="42" x2="290" y2="42" stroke="var(--data-3)" stroke-width="6" stroke-linecap="round" />
+              <line x1="290" y1="42" x2="800" y2="42" stroke="var(--primary)" stroke-width="6" stroke-linecap="round" />
+              <line x1="800" y1="42" x2="860" y2="42" stroke="var(--tertiary)" stroke-width="6" stroke-dasharray="6 6" stroke-linecap="round" />
+
+              <circle cx="90" cy="42" r="10" fill="var(--data-3)" />
+              <circle cx="310" cy="42" r="10" fill="var(--primary)" />
+              <circle cx="560" cy="42" r="10" fill="var(--primary)" />
+              <circle cx="800" cy="42" r="10" fill="var(--tertiary)" />
+
+              <text x="90" y="20" text-anchor="middle" fill="var(--on-surface)" font-size="13" font-weight="700">出發前 20 日內</text>
+              <text x="90" y="72" text-anchor="middle" fill="var(--on-surface-variant)" font-size="12">旅程取消保險</text>
+              <text x="90" y="90" text-anchor="middle" fill="var(--on-surface-variant)" font-size="11">暴動 / 罷工 / 居家災損</text>
+
+              <text x="310" y="20" text-anchor="middle" fill="var(--on-surface)" font-size="13" font-weight="700">機場報到至航程中</text>
+              <text x="310" y="72" text-anchor="middle" fill="var(--on-surface-variant)" font-size="12">班機延誤 &amp; 改降補償</text>
+              <text x="310" y="90" text-anchor="middle" fill="var(--on-surface-variant)" font-size="11">延誤4小時↑ / 機件故障</text>
+
+              <text x="560" y="20" text-anchor="middle" fill="var(--on-surface)" font-size="13" font-weight="700">海外旅行期間</text>
+              <text x="560" y="72" text-anchor="middle" fill="var(--on-surface-variant)" font-size="12">旅程更改 &amp; 突發醫療</text>
+              <text x="560" y="90" text-anchor="middle" fill="var(--on-surface-variant)" font-size="11">住宿交通 / 行李 / 盜刷</text>
+
+              <text x="800" y="20" text-anchor="middle" fill="var(--on-surface)" font-size="13" font-weight="700">返國延誤延伸</text>
+              <text x="800" y="72" text-anchor="middle" fill="var(--on-surface-variant)" font-size="12">保期自動延長</text>
+              <text x="800" y="90" text-anchor="middle" fill="var(--on-surface-variant)" font-size="11">最長 +24 小時（或至劫持終了）</text>
+            </svg>
+          </div>
+
+          <div class="timeline-nodes" role="group" aria-label="依旅程階段篩選理賠情境">
+            <button type="button" class="stage-btn" data-stage="all" onclick="setStageFilter('all')" aria-pressed="true">
+              <span class="stage-btn-title">全部情境（14 項）</span>
+              <span class="stage-btn-sub">完整檢視所有突發與社會狀況</span>
+            </button>
+            <button type="button" class="stage-btn" data-stage="pre" onclick="setStageFilter('pre')" aria-pressed="false">
+              <span class="stage-btn-title">1. 出發前（前20日至出境前）</span>
+              <span class="stage-btn-sub">暴動、罷工、居家天災致取消行程</span>
+            </button>
+            <button type="button" class="stage-btn" data-stage="flight" onclick="setStageFilter('flight')" aria-pressed="false">
+              <span class="stage-btn-title">2. 班機與航程（延誤 / 改降 / 機件）</span>
+              <span class="stage-btn-sub">延誤4小時、替代班機、免附證明</span>
+            </button>
+            <button type="button" class="stage-btn" data-stage="abroad" onclick="setStageFilter('abroad')" aria-pressed="false">
+              <span class="stage-btn-title">3. 海外停留（更改 / 醫療 / 財物）</span>
+              <span class="stage-btn-sub">額外食宿交通、醫療倍率、文件竊盜</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search and Quick Keyword Tags -->
+        <div class="explorer-controls">
+          <div class="search-row">
+            <div class="field-group">
+              <label class="field-label" for="scenario-search">搜尋情境關鍵字（例如：暴動、罷工、颱風、機件、替代班機、住宿、護照）</label>
+              <input type="search" id="scenario-search" class="input-control" placeholder="輸入關鍵字即時篩選…" oninput="handleSearchInput(this.value)">
+            </div>
+            <button type="button" class="btn btn-outline" onclick="clearScenarioFilters()">
+              <i data-lucide="x" aria-hidden="true"></i>
+              清除篩選
+            </button>
+          </div>
+
+          <div class="tag-row" role="group" aria-label="熱門突發狀況快選">
+            <span class="field-hint" style="font-weight: 700;">常見問題快選：</span>
+            <button type="button" class="filter-chip" data-tag="all" onclick="setQuickTag('all')" aria-pressed="true">全部顯示</button>
+            <button type="button" class="filter-chip" data-tag="暴動" onclick="setQuickTag('暴動')" aria-pressed="false">暴動／民眾騷擾</button>
+            <button type="button" class="filter-chip" data-tag="罷工" onclick="setQuickTag('罷工')" aria-pressed="false">罷工／工運</button>
+            <button type="button" class="filter-chip" data-tag="颱風" onclick="setQuickTag('颱風')" aria-pressed="false">颱風／天災</button>
+            <button type="button" class="filter-chip" data-tag="機件" onclick="setQuickTag('機件')" aria-pressed="false">機件維修／改降</button>
+            <button type="button" class="filter-chip" data-tag="替代班機" onclick="setQuickTag('替代班機')" aria-pressed="false">替代班機與失接</button>
+            <button type="button" class="filter-chip" data-tag="住宿交通" onclick="setQuickTag('住宿交通')" aria-pressed="false">住宿與交通費用</button>
+            <button type="button" class="filter-chip" data-tag="bookmarked" onclick="setQuickTag('bookmarked')" aria-pressed="false">僅看已收藏</button>
+          </div>
+        </div>
+
+        <div id="scenario-count-bar" class="field-hint" style="font-weight: 600;">顯示 14 / 14 筆理賠情境</div>
+
+        <!-- Rendered Scenario Cards -->
+        <div class="scenario-grid" id="scenario-grid"></div>
+      </section>
+
+      <!-- Section 3: Side-by-Side Comparison Table -->
+      <section id="compare-section" aria-labelledby="compare-heading">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" id="compare-heading">常見混淆概念對照：旅程取消 vs. 班機延誤 vs. 旅程更改</h2>
+            <p class="section-desc">
+              「出發前退團」與「出國後多花住宿交通費」適用完全不同的條款與限額，以下整理核心差異與最常踩中的不保紅線。
+            </p>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>比較項目</th>
+                <th>旅程取消保險（第 18–20 條）</th>
+                <th>班機延誤保險（第 21–23 條）</th>
+                <th>旅程更改保險（第 24–26 條）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>適用時間點</strong></td>
+                <td>預定海外旅程開始前 <strong>20 日起至海外旅行期間開始時止</strong>（出發前）。</td>
+                <td>保險期間內，搭乘定期航班延誤 <strong>4 小時以上</strong>（含取消、失接）。</td>
+                <td><strong>海外旅行期間內</strong>（完成台灣出境證照查驗後至返國入境前）。</td>
+              </tr>
+              <tr>
+                <td><strong>給付性質與上限</strong></td>
+                <td><strong>實支實付</strong>：無法取回之預繳團費、交通、住宿及票券（以保險金額為限）。</td>
+                <td><strong>定額給付（累進式）</strong>：每滿 4 小時給付固定額度，保險期間內最多 <strong>2 次</strong>。</td>
+                <td><strong>實支實付</strong>：增加之交通或住宿費，上限為原預定交通或每日住宿各 <strong>+20%</strong>；無原憑證者<strong>每日合計 NT$ 2,000</strong>。</td>
+              </tr>
+              <tr>
+                <td><strong>暴動 / 民眾騷擾</strong></td>
+                <td><span class="chip">可賠</span> 預定前往地點發生暴動或民眾騷擾（第 18 條第 1 項第 4 款）。</td>
+                <td>僅看班機是否因故延誤達 4 小時以上；無單獨限暴動事由。</td>
+                <td><span class="chip">可賠</span> 所處地點或預定前往地點發生戰爭、暴動、民眾騷擾（第 24 條第 1 項第 2 款）。</td>
+              </tr>
+              <tr>
+                <td><strong>罷工 / 工運活動</strong></td>
+                <td><span class="chip" data-status="warn">條件式</span> 需致預定班次取消或延誤達 <strong>24 小時（含）以上</strong>；投保時已預告或取得罷工權不賠。</td>
+                <td><span class="chip" data-status="warn">條件式</span> 延誤 4 小時以上可賠；但投保時已取得罷工權、預告或已宣布/發生罷工工運不賠。</td>
+                <td><span class="chip" data-status="warn">條件式</span> 需於海外期間因業者受僱人/地勤罷工致改行程；投保時已取得罷工權或宣布者不賠。</td>
+              </tr>
+              <tr>
+                <td><strong>颱風 / 天災</strong></td>
+                <td><span class="chip" data-status="warn">限定條件</span> 條款第 18 條第 5 款限「境內住居所因颱風等天災毀損逾 <strong>25 萬元</strong>」；純目的地颱風不直接賠取消。</td>
+                <td><span class="chip" data-status="warn">注意警報</span> 延誤 4 小時以上可賠，但「投保時氣象機構已發布海上颱風警報」不賠。</td>
+                <td><span class="chip">可賠</span> 海外所處或前往地點發生天災（颱風、地震等）被迫改行程；投保時已發海上颱風警報不賠。</td>
+              </tr>
+              <tr>
+                <td><strong>重要不保紅線</strong></td>
+                <td>一經申領旅程取消，<strong>其餘不便險項目效力終止</strong>並無息退費；代金/點數/哩程償還部分不賠。</td>
+                <td><strong>未搭航空公司第一班替代交通工具</strong>不賠；自行改飛不同目的地不賠；去/回程同機場視為同一事故 1 次。</td>
+                <td><strong>未搭第一班替代交通工具</strong>不賠；<strong>中華民國境內住宿及交通費</strong>不賠；機件故障未發生重大意外事故不適用第 24 條第 5 款。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Source Credit Footer -->
+      <footer class="source-footer">
+        <strong>資料來源與條款備查依據：</strong>
+        本頁面理賠規則、條文編號、計算限制及地區係數皆彙整自「金平安6專案_保單條款.pdf」，涵蓋：
+        南山產物個人旅行平安保險（113.10.30 南山保字第 1130004447 號函備查）、
+        南山產物個人旅行保險新海外突發疾病醫療附加保險（115.03.26 南山保字第 1150001697 號函備查）、
+        南山產物個人旅行保險食物中毒保險金附加條款（112.09.21 南山保字第 1120005018 號函備查）、
+        南山產物傷害保險恐怖主義行為保險限額給付附加條款、
+        南山產物新個人旅行不便綜合保險（115.03.26 南山保字第 1150001694 號函備查）及其班機改降補償、信用卡盜刷、現金竊盜、傳染病及檢疫給付、離島兩岸水上公共交通工具延誤、班機延誤免檢附部分理賠文件等附加條款。
+        實際承保內容、各計劃別保額及應繳保費，仍以簽發保單之要保書、保單首頁與最新費率表為準。
+      </footer>
+    </main>
+  </div>
+
+  <api-shim></api-shim>
+  <script>
+    // Default demonstration schedule (editable by user since DM images carry no readable OCR numbers)
+    const DEFAULT_PLANS = {
+      1: { name: `計劃一`, label: `基礎型`, base5: 480, dailyAfter5: 75, addSumWan: 300, medBaseWan: 30 },
+      2: { name: `計劃二`, label: `標準型`, base5: 760, dailyAfter5: 120, addSumWan: 500, medBaseWan: 50 },
+      3: { name: `計劃三`, label: `進階型`, base5: 1280, dailyAfter5: 195, addSumWan: 1000, medBaseWan: 100 },
+      4: { name: `計劃四`, label: `高保障`, base5: 1750, dailyAfter5: 265, addSumWan: 1200, medBaseWan: 150 },
+      5: { name: `計劃五`, label: `旗艦型`, base5: 2290, dailyAfter5: 340, addSumWan: 1500, medBaseWan: 200 }
+    };
+
+    const REGION_MAP = {
+      other: { label: `其他海外地區`, factor: 1.0, pct: `100%`, barWidth: `33.3%` },
+      jp_kr_au_nz: { label: `日本、韓國、紐西蘭、澳大利亞`, factor: 2.0, pct: `200%`, barWidth: `66.6%` },
+      us_ca_eu: { label: `美國、加拿大、歐洲`, factor: 3.0, pct: `300%`, barWidth: `100%` }
+    };
+
+    const SCENARIOS = [
+      {
+        id: `riot-cancel`,
+        stage: `pre`,
+        status: `ok`,
+        statusText: `出發前可賠（實支實付）`,
+        title: `預定前往地點發生「暴動、民眾騷擾」，出發前取消全部旅程`,
+        clause: `新個人旅行不便綜合保險 第 18 條第 1 項第 4 款、第 19–20 條`,
+        keywords: `暴動 民眾騷擾 抗議 示威 取消 旅程取消 退費 團費 住宿 交通 票券`,
+        summary: `在預定海外旅程開始前 20 日起至海外旅行期間開始時止（特定期間內），預定前往地點發生暴動或民眾騷擾（含軍警鎮壓行為）致必須取消全部旅程，可申請賠償無法取回之預繳費用。`,
+        benefits: [
+          `給付範圍：無法取回之預繳團費、交通、住宿及票券費用（實支實付，最高以保險金額為限）。`,
+          `費用拆分：單據若包含同行他人費用且無法拆分，按人數比例計算本人份額。`
+        ],
+        exclusions: [
+          `一經申領旅程取消保險金，其餘不便險項目效力即行終止並無息退還其餘保費（第 2 條）。`,
+          `業者退款或以代金、點數、哩程數、兌換券等非貨幣形式償還之等值金額不予理賠（第 19 條）。`,
+          `暴動事件若早於出發前 20 日以前發生，或於出境後才發生，不適用旅程取消（適用旅程更改）。`
+        ],
+        docs: `理賠申請書、契約/購票/訂房證明、費用單據正本、無法退款證明、中華民國或目的地政府機關出具之事故證明（須註明日期）。`
+      },
+      {
+        id: `riot-change`,
+        stage: `abroad`,
+        status: `ok`,
+        statusText: `旅途中可賠（實支實付）`,
+        title: `海外旅途中遇「暴動、民眾騷擾或戰爭」，被迫更改行程`,
+        clause: `新個人旅行不便綜合保險 第 24 條第 1 項第 2 款、第 25–26 條`,
+        keywords: `暴動 民眾騷擾 戰爭 改行程 旅程更改 住宿交通 交通費 住宿費`,
+        summary: `於海外旅行期間內（出境證照查驗後），所處地點或預定前往地點發生戰爭、暴動或民眾騷擾，致必須更改預定旅程而增加的海外交通或住宿費用。`,
+        benefits: [
+          `給付計算：實際新增支出扣除原業者可退款或非貨幣償還後，最高以原預定交通或每日住宿費用各增加 20% 為限。`,
+          `無原預繳證明者：以每日交通及住宿費用合計新台幣 2,000 元為限。`
+        ],
+        exclusions: [
+          `投保時已發生之事故、怠於通知業者、或未搭乘航空公司第一班替代交通工具（除不可抗力）不賠。`,
+          `中華民國境內之住宿與交通費用不賠（第 25 條第 7 款）。`,
+          `重要提醒：直接或間接因暴動、叛亂所致之「行李損失」，屬於行李損失險特別不保事項（第 32 條第 3 款）。`
+        ],
+        docs: `理賠申請書、新增費用單據正本、原預定行程單據與明細、無法退款證明、政府機關事故證明（須註明日期）。`
+      },
+      {
+        id: `strike-cancel`,
+        stage: `pre`,
+        status: `warn`,
+        statusText: `條件式可賠（注意預告時點）`,
+        title: `航空公司或機場地勤「罷工」，致出發前航班取消或延誤 24 小時以上`,
+        clause: `新個人旅行不便綜合保險 第 18 條第 1 項第 3 款、第 19–20 條`,
+        keywords: `罷工 地勤 運務 取消 旅程取消 24小時 罷工權 住宿交通`,
+        summary: `於出發前 20 日至出境前，因預定搭乘之公共交通工具業者受僱人或機場地勤、運務人員罷工，致預定班次取消或延誤達 24 小時（含）以上，因而取消全部旅程。`,
+        benefits: [
+          `給付項目：無法取回之預繳團費、交通、住宿及票券費用（實支實付）。`,
+          `若未取消整趟旅程而是搭機受阻，請改看「班機延誤保險（4小時起）」或「旅程更改保險」。`
+        ],
+        exclusions: [
+          `致命紅線（第 19 條第 4 款）：投保時，相關人員「已取得罷工權、已預告罷工期間或已宣布罷工」者，完全不負理賠責任！`,
+          `業者破產、清算或債務不履行不賠；代金/哩程等償還部分不賠。`
+        ],
+        docs: `理賠申請書、購票/訂房單據、無法退款證明、公共交通工具業者出具之罷工與班次取消/延誤 24 小時以上證明。`
+      },
+      {
+        id: `strike-delay-change`,
+        stage: `flight`,
+        status: `warn`,
+        statusText: `延誤定額 + 改行程實支`,
+        title: `遇「罷工或工運活動」導致班機延誤、取消或轉接失接`,
+        clause: `新個人旅行不便綜合保險 第 21–26 條`,
+        keywords: `罷工 工運 抗議 延誤 取消 失接 班機延誤 旅程更改 替代班機 住宿交通`,
+        summary: `若投保前未出現罷工預兆，遇罷工致定期航班延誤 4 小時以上可申請「班機延誤（定額累進）」；若於海外期間因罷工必須更改旅程，可申請「旅程更改（新增交通/住宿實支實付）」。`,
+        benefits: [
+          `班機延誤保險：實際出發較預定延誤滿 4 小時即啟動，每滿 4 小時累進給付，保險期間內以 2 次為限。`,
+          `旅程更改保險：海外旅行期間內因罷工改行程，新增交通/住宿按原預定 +20% 限額內實支實付（無原單據每日合計 NT$2,000 為限）。`
+        ],
+        exclusions: [
+          `投保時業者受僱人或地勤「已取得罷工權、已預告罷工期間、已宣布或已發生罷工或工運活動」者，班機延誤與旅程更改均不賠！`,
+          `未搭乘航空業者提供之第一班替代交通工具（除不可抗力）不賠。`,
+          `離島兩岸水上交通（小三通）則依「水上公共交通工具延誤附加條款」辦理，同樣需滿 4 小時且排除投保前已宣布罷工/工運。`
+        ],
+        docs: `機票及登機證（或搭機證明）、延誤證明（若由南山比對定期航班資訊可依免檢附條款免附申請書及延誤證明）；申請旅程更改另附費用單據與事故證明。`
+      },
+      {
+        id: `typhoon-flight`,
+        stage: `flight`,
+        status: `warn`,
+        statusText: `延誤 4 小時↑定額（留意海警時點）`,
+        title: `「颱風／暴風」導致班機延誤、班機取消或轉接班機失接`,
+        clause: `新個人旅行不便綜合保險 第 21–22 條、海上颱風警報除外條款`,
+        keywords: `颱風 海警 海上颱風警報 天災 班機延誤 班機取消 替代班機 轉機失接`,
+        summary: `因颱風等天氣因素導致定期航班較預定時間延誤 4 小時以上（含取消後改搭替代班機起飛時間計算，或前班延誤致轉接班機失接），可依累進式定額給付理賠。`,
+        benefits: [
+          `計算方式：班機延誤每滿 4 小時給付一次定額（受每次最高上限限制），全期最多賠 2 次。`,
+          `同一事故認定：去程同一機場延誤/取消、回程同一機場延誤/取消、因延誤/取消致轉接失接，各視為同一事故（限賠 1 次）。`,
+          `回程延誤導致超時：保單自動延長有效期限至終止乘客身分止，最長 +24 小時（第 6 條）。`
+        ],
+        exclusions: [
+          `最大地雷（第 22 條第 2 款）：申請訂立保險契約時，中華民國政府氣象機構「已發布海上颱風警報」者，不負理賠責任！`,
+          `未搭乘航空業者所提供之第一班替代交通工具（除不可抗力）、或自行改飛不同目的地者不賠。`
+        ],
+        docs: `機票及登機證或搭機證明；若符合「班機延誤免檢附部分理賠文件附加條款」由本公司比對航情，可免附理賠申請書與延誤證明。`
+      },
+      {
+        id: `typhoon-abroad-change`,
+        stage: `abroad`,
+        status: `ok`,
+        statusText: `旅途中可賠（額外住宿交通）`,
+        title: `海外旅途中遇「颱風、地震、洪水、火山爆發等天災」被迫改行程`,
+        clause: `新個人旅行不便綜合保險 第 3 條第 10 款、第 24–26 條`,
+        keywords: `颱風 地震 洪水 火山爆發 海嘯 土石流 天災 旅程更改 住宿交通 住宿費 交通費`,
+        summary: `在海外旅行期間內，所處地點或預定前往地點發生天災（含颱風、暴風、龍捲風、洪水、雷擊、地震、火山爆發、海嘯、土石流等）致必須更改旅程而增加之海外交通或住宿費用。`,
+        benefits: [
+          `新增交通/住宿費用實支實付：以原預定交通或每日住宿費用各增加 20% 為上限。`,
+          `若無法提出原預繳費用或退款證明（例如自由行尚未訂房路段），則以每日交通及住宿合計新台幣 2,000 元為限。`
+        ],
+        exclusions: [
+          `投保時中華民國氣象機構已發布海上颱風警報者不賠（第 25 條第 3 款）。`,
+          `返回中華民國境內後所產生之國內住宿與交通費用不賠（第 25 條第 7 款）。`
+        ],
+        docs: `理賠申請書、新增費用正本單據、原預定行程單據及無法退款證明、中華民國或當地政府機關出具之天災事故證明（須註明日期）。`
+      },
+      {
+        id: `typhoon-home-cancel`,
+        stage: `pre`,
+        status: `info`,
+        statusText: `住居所災損逾 25 萬可賠`,
+        title: `出發前台灣住居所因「颱風、地震、洪水、火災」毀損被迫取消行程`,
+        clause: `新個人旅行不便綜合保險 第 18 條第 1 項第 5 款、第 20 條第 6 款`,
+        keywords: `颱風 地震 洪水 火災 天災 住居所 取消 旅程取消 25萬`,
+        summary: `許多保戶誤以為目的地發颱風警報就能申請「旅程取消」，其實條款第 18 條針對天災的出發前取消，明確保障的是「台灣住居所」發生重大毀損之情況。`,
+        benefits: [
+          `保障條件：出發前 20 日內，被保險人在中華民國境內住居所建築物及內部動產，因火災、洪水、地震、颱風等天災毀損，且損失金額超過新台幣 25 萬元。`,
+          `理賠無法取回之預繳團費、交通、住宿及票券費用。`
+        ],
+        exclusions: [
+          `若住居所無災損，僅因擔心目的地颱風而自行取消出國，不符合第 18 條旅程取消要件（需待班機確定取消/延誤達標後改看相關險種或依旅遊契約退費）。`
+        ],
+        docs: `理賠申請書、無法退款證明及預繳單據，加上保險公司、公證公司、稅務/消防機關或村里長/幹事出具之損失證明（載明金額、地點與時間）。`
+      },
+      {
+        id: `mechanical-issue`,
+        stage: `flight`,
+        status: `ok`,
+        statusText: `起飛前延誤 / 起飛後改降`,
+        title: `遇到飛機「機件維修／機械故障」（起飛前延誤 vs. 起飛後迫降改降）`,
+        clause: `不便險第 21 條（班機延誤）、班機改降補償附加條款、第 24 條第 5 款`,
+        keywords: `機件維修 機械故障 機件故障 班機延誤 班機改降 迫降 轉降 替代班機 住宿交通`,
+        summary: `依發生在起飛前或起飛後，對應不同理賠項目；需特別區分是否符合「旅程更改」之事故定義。`,
+        benefits: [
+          `起飛前機件維修致延誤/取消：延誤達 4 小時以上，可申請「班機延誤保險（定額累進，最多 2 次）」。`,
+          `起飛後機械故障（或天氣因素）改降：改降落非原定降落機場（不含返回起飛機場），可申請「班機改降補償附加條款」，改降海外給付 100%，改降台灣境內其他機場按 50% 給付（期間最多 2 次）。`
+        ],
+        exclusions: [
+          `重要區分：旅程更改（第 24 條第 5 款）僅承保搭乘交通工具發生「沉沒、翻覆、碰撞、出軌、墜落、爆炸、火災」之意外事故；單純起飛前機械檢修（未發生前述意外事故）額外產生的住宿交通費，僅能以「班機延誤定額給付」支應，無法另申請旅程更改實支實付！`
+        ],
+        docs: `延誤適用：機票、登機證及延誤證明（或適用免檢附比對）；改降適用：理賠申請書、航空公司班機改降證明文件、機票及登機證。`
+      },
+      {
+        id: `alternative-flight`,
+        stage: `flight`,
+        status: `warn`,
+        statusText: `未搭第一班替代車機恐不賠`,
+        title: `班機取消與「替代班機」、轉機失接及自動延長保期規範`,
+        clause: `不便險第 6 條、第 21–23 條、免檢附部分理賠文件附加條款`,
+        keywords: `替代班機 班機取消 轉機 失接 延誤 24小時 自動延長 免檢附 住宿交通`,
+        summary: `班機被取消或前段班機晚點導致轉機失接時，延誤時間的計算終點與「替代班機的選擇」將直接決定能否獲賠。`,
+        benefits: [
+          `延誤計算起迄：班機取消自原預定出發時起算，至替代班機實際出發時止；轉接失接自原預定轉接班機出發時起，至替代轉接班機實際出發時止。`,
+          `自行訂購替代班機：除返國班機外，須於原保險期間到期前安排，且目的地須與原預定相同（僅改轉機地可）。`,
+          `保期自動延長：搭機延誤抵達非所能控制者，主約與不便險自動延長至終止乘客身分時止，最長 24 小時（遭劫持則至脫離劫持）。`,
+          `免附證明便利：主動提供定期航班資訊由本公司逕行比對並認可申請者，免附理賠申請書與航空業者延誤證明。`
+        ],
+        exclusions: [
+          `大忌（第 22 條第 5 款、第 25 條第 6 款）：若未搭乘航空公司所提供之「第一班替代交通工具」（除非有不可抗力因素），班機延誤與旅程更改皆不賠！`,
+          `抵達機場時已逾登機辦理時間、或自行放棄搭乘、或航空公司破產清算均不賠。`
+        ],
+        docs: `原班機與替代班機之機票及登機證（或搭機證明）；若非採電子比對免附方案，需附航空業者載有延誤時間之證明。`
+      },
+      {
+        id: `hotel-transport-rules`,
+        stage: `abroad`,
+        status: `info`,
+        statusText: `理賠金額計算與上限總整理`,
+        title: `額外「住宿與交通費用」怎麼賠？（實支實付上限與常見扣減）`,
+        clause: `新個人旅行不便綜合保險 第 18–20 條、第 24–26 條`,
+        keywords: `住宿 交通 住宿費用 交通費用 實支實付 20% 2000元 退費 哩程 代金 住宿交通`,
+        summary: `所有額外增加的住宿與交通費用（旅程更改）及出發前預繳費用（旅程取消）均採實支實付，計算時有以下關鍵數學公式與上限規定。`,
+        benefits: [
+          `出發前取消（第 18 條）：賠付「無法取回之原預繳費用」，總額以保單所載保險金額為限。`,
+          `海外更改旅程（第 24 條）：實際新增交通或住宿費（須先扣除原訂行程業者退款），最高以「原預定交通費」或「原預定每日住宿費」各增加 20% 為上限。`,
+          `無原預繳證明時之保底上限（第 24 條）：若無法提供原預繳費用或退款證明，每日交通及住宿費用合計最高以新台幣 2,000 元為限。`
+        ],
+        exclusions: [
+          `同業或業者以代金、點數、哩程數、兌換券償還之等值金額，視為已退款並予以扣除（不重覆給付）。`,
+          `單據含同行親友且無法拆分時，依人數比例計算本人額度。`,
+          `海外旅程更改之交通與住宿，不包含中華民國境內產生之費用。`
+        ],
+        docs: `新增費用收據正本、原預定行程明細及金額證明、業者無法退款或非貨幣償還證明、符合承保事故之證明文件。`
+      },
+      {
+        id: `baggage-delay-loss`,
+        stage: `abroad`,
+        status: `ok`,
+        statusText: `延誤 6 小時↑定額／損失須報案`,
+        title: `隨行託運「行李延誤（6小時以上）」或「行李竊盜／毀損」`,
+        clause: `新個人旅行不便綜合保險 第 27–35 條`,
+        keywords: `行李延誤 行李遺失 行李毀損 託運 6小時 報警 24小時`,
+        summary: `抵達海外目的地後行李遲遲未到，或行李箱內財物遭竊、託運過程遭交通業者毀損滅失之處理步驟。`,
+        benefits: [
+          `行李延誤（定額給付）：隨行託運並取得領取單之行李，因交通業者處理失當致抵達目的地 6 小時後仍未領得，定額理賠（期間內以 2 次為限）。`,
+          `行李損失（定額給付）：含竊盜/強盜/搶奪，或由公共交通工具業者託運保管時之毀損滅失。`
+        ],
+        exclusions: [
+          `返國不賠延誤：於返回中華民國境內機場，或返回住居所時發生之行李延誤，不予理賠（第 28 條）。`,
+          `事先另行寄送/分開郵寄之行李不賠；單純外觀擦撞剝落而不影響功能、或非竊盜強奪之不明原因遺失不賠。`,
+          `理賠後若行李全數尋獲，被保險人須領回並退還原領保險金（第 35 條）。`
+        ],
+        docs: `行李延誤：延誤 6 小時以上證明、行李條/托運憑證。行李損失：遭竊須於 24 小時內向當地警方報案取得報案證明；託運毀損須儘速向交通業者索取書面事故與損失證明。`
+      },
+      {
+        id: `passport-loss`,
+        stage: `abroad`,
+        status: `ok`,
+        statusText: `定額理賠 + 可連動旅程更改`,
+        title: `「護照、簽證等旅行文件」遺失或遭竊盜搶奪`,
+        clause: `新個人旅行不便綜合保險 第 36–38 條、第 24 條第 1 項第 4 款`,
+        keywords: `護照 簽證 旅行文件 遺失 竊盜 24小時 報案 旅程更改 住宿交通`,
+        summary: `護照遺失或遭竊不僅可申請旅行文件損失定額理賠，若因此無法按原定時間搭機必須滯留重辦文件，還可連動啟動旅程更改！`,
+        benefits: [
+          `旅行文件損失保險（定額）：海外旅行期間旅行文件被強盜、搶奪、竊盜或遺失並重新申辦時，依約定保額定額給付（期間以 2 次為限）。`,
+          `連動旅程更改（第 24 條第 1 項第 4 款）：因旅行文件被強盜、搶奪、竊盜或遺失致必須更改預定旅程所增交通與住宿費，亦可依實支實付規定申請。`
+        ],
+        exclusions: [
+          `硬性時限（第 37 條）：未於事故發生後「24 小時內」向當地警方報案並取得報案證明者，不負理賠責任！`
+        ],
+        docs: `理賠申請書、24 小時內向當地警方取得之報案證明、重新申辦旅行文件之證明；若併同申請旅程更改需附新增交通住宿單據。`
+      },
+      {
+        id: `medical-epidemic`,
+        stage: `abroad`,
+        status: `ok`,
+        statusText: `依地區放大 100%~300%`,
+        title: `海外「突發疾病、食物中毒」就醫，或遇「傳染病／強制檢疫」`,
+        clause: `新海外突發疾病醫療附約、食物中毒附約、傳染病及檢疫附加條款`,
+        keywords: `突發疾病 住院 門診 急診 食物中毒 傳染病 檢疫 隔離 疫情三級 關閉邊境 300% 200%`,
+        summary: `海外突發疾病醫療限額依前往地區自動調整，並另備有食物中毒及傳染病/檢疫致旅程取消或更改之附加條款。`,
+        benefits: [
+          `突發疾病醫療：保障海外住院、門診、急診診療（含搭乘赴海外之民航船機上發生事故），限額係數為美加歐 300%、日韓紐澳 200%、其他地區 100%。`,
+          `食物中毒保險金：依食物中毒附加條款給付。`,
+          `傳染病及檢疫（取消/更改）：包含出發前 20 日內境內強制檢疫、目的地疫情建議達第三級、目的地關閉邊境（含起飛後始關閉邊境被迫返國），或海外旅行期間發生傳染病/被要求檢疫。`
+        ],
+        exclusions: [
+          `突發疾病必須為「生效前 180 日以內未曾接受該疾病診療」且需即時診療之疾病；慢性病舊疾復發不賠。`,
+          `檢疫更改排除被保險人自身違反檢疫規定或應採行而未採行之作為。`
+        ],
+        docs: `醫療診斷書及收據（外幣依臺灣銀行即期現金賣出匯價換算）；傳染病檢疫需附強制檢疫證明或政府機關事故證明（須註明日期）。`
+      },
+      {
+        id: `card-cash-rescue`,
+        stage: `abroad`,
+        status: `info`,
+        statusText: `財物竊盜／救援看護／恐攻限額`,
+        title: `信用卡盜刷、旅館現金竊盜、緊急醫療救援（子女看護／探病）與恐怖主義`,
+        clause: `信用卡盜刷/現金竊盜/恐怖主義附加條款、不便險第 39 條（緊急救援）`,
+        keywords: `信用卡 盜刷 現金 竊盜 緊急救援 醫療運送 子女看護 探病 恐怖主義 200萬`,
+        summary: `涵蓋海外財物失竊安全網、重大傷病時家屬前往照顧或探病之交通住宿，以及恐怖主義事件之法規限額說明。`,
+        benefits: [
+          `信用卡盜刷：遺失或被竊搶後，向發卡機構掛失止付前「24 小時內」未經授權盜刷損失（含掛失與重置費）。`,
+          `現金竊盜：隨身攜帶或「鎖妥於旅館房間內」之現金遭竊盜強盜搶奪（須 24 小時內報警）。`,
+          `緊急救援（第 39 條）：含緊急醫療運送、遺體運返、重大傷病連續住院達 5 日以上時 1 名親屬/夥伴之「探病費用」及照顧隨行 15 歲以下子女（須同為被保險人）之「子女看護費用」。`,
+          `恐怖主義行為：死亡或失能限額給付，最高以新台幣 200 萬元為限（失能按等級比例乘 200 萬計算）。`
+        ],
+        exclusions: [
+          `現金竊盜若因旅館房間「未予鎖妥」、自身疏忽或點查不符所致損失不賠。`,
+          `支票/匯票/旅支未依約辦妥掛失止付手續者不賠。`
+        ],
+        docs: `盜刷：銀行掛失止付與盜刷明細；現金竊盜：24 小時內報案證明與損失清單；救援：救援公司判定與醫師診斷書、住院達 5 日證明。`
+      }
+    ];
+
+    // App State
+    let appState = {
+      startDate: `2026-12-10`,
+      endDate: `2026-12-14`,
+      birthDate: `1992-05-15`,
+      region: `jp_kr_au_nz`,
+      plan: 3,
+      customRates: null,
+      stageFilter: `all`,
+      quickTag: `all`,
+      searchQuery: ``,
+      bookmarks: [],
+      activePreset: `jp-adult`
+    };
+
+    let activeRateDrawerOpen = false;
+
+    function cloneDefaultPlans() {
+      const out = {};
+      for (const k of Object.keys(DEFAULT_PLANS)) {
+        out[k] = Object.assign({}, DEFAULT_PLANS[k]);
+      }
+      return out;
+    }
+
+    function getActivePlans() {
+      if (appState.customRates && typeof appState.customRates === `object`) {
+        return appState.customRates;
+      }
+      return cloneDefaultPlans();
+    }
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: `smooth`, block: `start` });
+    }
+
+    function parseLocalDate(str) {
+      if (!str || !/^\d{4}-\d{2}-\d{2}$/.test(str)) return null;
+      const parts = str.split(`-`).map(Number);
+      const d = new Date(parts[0], parts[1] - 1, parts[2]);
+      if (isNaN(d.getTime())) return null;
+      return d;
+    }
+
+    function computeAgeAtDate(birth, target) {
+      let age = target.getFullYear() - birth.getFullYear();
+      const mDiff = target.getMonth() - birth.getMonth();
+      if (mDiff < 0 || (mDiff === 0 && target.getDate() < birth.getDate())) {
+        age -= 1;
+      }
+      return age;
+    }
+
+    function formatCurrency(num) {
+      return `NT$ ` + Math.round(num).toLocaleString(`zh-TW`);
+    }
+
+    function syncInputsFromState() {
+      const sEl = document.getElementById(`start-date`);
+      const eEl = document.getElementById(`end-date`);
+      const bEl = document.getElementById(`birth-date`);
+      const rEl = document.getElementById(`region-select`);
+      const searchEl = document.getElementById(`scenario-search`);
+
+      if (sEl) sEl.value = appState.startDate;
+      if (eEl) eEl.value = appState.endDate;
+      if (bEl) bEl.value = appState.birthDate;
+      if (rEl) rEl.value = appState.region;
+      if (searchEl) searchEl.value = appState.searchQuery;
+
+      document.querySelectorAll(`.plan-pill`).forEach(btn => {
+        const p = Number(btn.dataset.plan);
+        btn.setAttribute(`aria-pressed`, p === Number(appState.plan) ? `true` : `false`);
+      });
+
+      document.querySelectorAll(`.preset-btn`).forEach(btn => {
+        btn.setAttribute(`aria-pressed`, btn.dataset.preset === appState.activePreset ? `true` : `false`);
+      });
+
+      document.querySelectorAll(`.stage-btn`).forEach(btn => {
+        btn.setAttribute(`aria-pressed`, btn.dataset.stage === appState.stageFilter ? `true` : `false`);
+      });
+
+      document.querySelectorAll(`.filter-chip`).forEach(btn => {
+        btn.setAttribute(`aria-pressed`, btn.dataset.tag === appState.quickTag ? `true` : `false`);
+      });
+
+      const plans = getActivePlans();
+      for (let i = 1; i <= 5; i++) {
+        const sub = document.getElementById(`plan-sub-` + i);
+        if (sub && plans[i]) {
+          sub.textContent = plans[i].addSumWan + `萬基準`;
+        }
+      }
+
+      syncCustomRateInputs();
+    }
+
+    function syncCustomRateInputs() {
+      const plans = getActivePlans();
+      const cur = plans[appState.plan] || DEFAULT_PLANS[3];
+      const dName = document.getElementById(`drawer-plan-name`);
+      const baseEl = document.getElementById(`custom-base-fee`);
+      const dailyEl = document.getElementById(`custom-daily-fee`);
+      const addEl = document.getElementById(`custom-add-sum`);
+      const medEl = document.getElementById(`custom-med-base`);
+
+      if (dName) dName.textContent = cur.name;
+      if (baseEl) baseEl.value = cur.base5;
+      if (dailyEl) dailyEl.value = cur.dailyAfter5;
+      if (addEl) addEl.value = cur.addSumWan;
+      if (medEl) medEl.value = cur.medBaseWan;
+    }
+
+    function calculateAndRender() {
+      const sEl = document.getElementById(`start-date`);
+      const eEl = document.getElementById(`end-date`);
+      const bEl = document.getElementById(`birth-date`);
+      const errEl = document.getElementById(`calc-error`);
+
+      const start = parseLocalDate(appState.startDate);
+      const end = parseLocalDate(appState.endDate);
+      const birth = parseLocalDate(appState.birthDate);
+
+      let errMsg = ``;
+      if (sEl) sEl.setAttribute(`aria-invalid`, `false`);
+      if (eEl) eEl.setAttribute(`aria-invalid`, `false`);
+      if (bEl) bEl.setAttribute(`aria-invalid`, `false`);
+
+      if (!start || !end) {
+        errMsg = `請選擇完整的出發日期與返國日期。`;
+      } else if (end < start) {
+        errMsg = `返國日期不可早於出發日期，請重新選擇旅遊日期區間。`;
+        if (eEl) eEl.setAttribute(`aria-invalid`, `true`);
+      }
+
+      const diffDays = start && end ? Math.floor((end - start) / 86400000) + 1 : 0;
+      if (!errMsg && diffDays > 180) {
+        errMsg = `單次旅遊天數已達 ` + diffDays + ` 天（一般個人旅行綜合險多以 180 天為常見上限，請確認核保規定）。`;
+      }
+
+      if (!errMsg && !birth) {
+        errMsg = `請輸入被保險人的出生年月日以計算出發日實足年齡。`;
+        if (bEl) bEl.setAttribute(`aria-invalid`, `true`);
+      } else if (!errMsg && birth > start) {
+        errMsg = `出生年月日不可晚於旅遊出發日期。`;
+        if (bEl) bEl.setAttribute(`aria-invalid`, `true`);
+      }
+
+      if (errEl) {
+        if (errMsg) {
+          errEl.textContent = errMsg;
+          errEl.classList.add(`visible`);
+        } else {
+          errEl.textContent = ``;
+          errEl.classList.remove(`visible`);
+        }
+      }
+
+      if (errMsg && (!start || !end || end < start || !birth || birth > start)) {
+        return;
+      }
+
+      const age = computeAgeAtDate(birth, start);
+      const plans = getActivePlans();
+      const plan = plans[appState.plan] || DEFAULT_PLANS[3];
+      const regionInfo = REGION_MAP[appState.region] || REGION_MAP.jp_kr_au_nz;
+
+      // Demo premium calculation: 5-day base tier (pro-rated slightly if <5 days) + daily increment after 5 days
+      let rawPremium = 0;
+      let formulaDesc = ``;
+      if (diffDays <= 5) {
+        const factor = diffDays === 5 ? 1 : (0.48 + diffDays * 0.104);
+        rawPremium = Math.round((plan.base5 * factor) / 10) * 10;
+        formulaDesc = plan.name + `（` + diffDays + ` 日短天期級距）≈ ` + formatCurrency(rawPremium);
+      } else {
+        const extraDays = diffDays - 5;
+        rawPremium = plan.base5 + extraDays * plan.dailyAfter5;
+        formulaDesc = plan.base5 + ` 元（前5日）+ ` + extraDays + ` 日 × ` + plan.dailyAfter5 + ` 元 = ` + formatCurrency(rawPremium);
+      }
+
+      // Under-15 child adjustment notice & factor
+      const isUnder15 = age < 15;
+      const isSenior = age >= 70;
+      let displayedPremium = rawPremium;
+      let ageFactorNote = `一般成人（100% 基準）`;
+      if (isUnder15) {
+        // Under-15 cannot buy high adult death benefit; show adjusted reference note
+        displayedPremium = Math.round((rawPremium * 0.72) / 10) * 10;
+        ageFactorNote = `未滿 15 足歲（依喪葬費用限額調整示範費率）`;
+      }
+
+      const perDay = Math.round(displayedPremium / Math.max(1, diffDays));
+      const medLimitWan = Math.round(plan.medBaseWan * regionInfo.factor);
+
+      // Update KPI cards
+      const outPrem = document.getElementById(`out-premium`);
+      const outPremSub = document.getElementById(`out-premium-sub`);
+      const chipPlanBadge = document.getElementById(`chip-plan-badge`);
+      if (outPrem) outPrem.textContent = formatCurrency(displayedPremium);
+      if (outPremSub) outPremSub.textContent = `平均每日約 ` + formatCurrency(perDay) + ` / 人` + (isUnder15 ? `（已按未滿15歲級距調降）` : ``);
+      if (chipPlanBadge) chipPlanBadge.textContent = plan.name;
+
+      const nights = Math.max(0, diffDays - 1);
+      const outDays = document.getElementById(`out-days`);
+      const outDaysSub = document.getElementById(`out-days-sub`);
+      const chipDaysBadge = document.getElementById(`chip-days-badge`);
+      if (outDays) outDays.textContent = diffDays + ` 天 ` + nights + ` 夜`;
+      if (outDaysSub) outDaysSub.textContent = `搭機延誤最高自動延長 +24 小時（第 4/6 條）`;
+      if (chipDaysBadge) chipDaysBadge.textContent = diffDays + ` 日區間`;
+
+      const outAge = document.getElementById(`out-age`);
+      const outAgeSub = document.getElementById(`out-age-sub`);
+      const chipAgeBadge = document.getElementById(`chip-age-badge`);
+      const cardAge = document.getElementById(`card-age`);
+      const calloutBox = document.getElementById(`age-rule-callout`);
+      const calloutTitle = document.getElementById(`age-callout-title`);
+      const calloutBody = document.getElementById(`age-callout-body`);
+
+      if (outAge) outAge.textContent = age + ` 歲`;
+
+      if (isUnder15) {
+        if (cardAge) cardAge.dataset.status = `warn`;
+        if (chipAgeBadge) {
+          chipAgeBadge.textContent = `未滿 15 足歲`;
+          chipAgeBadge.dataset.status = `warn`;
+        }
+        if (outAgeSub) {
+          outAgeSub.textContent = `身故保險金變更為「喪葬費用保險金」`;
+          outAgeSub.className = `kpi-caption is-warn`;
+        }
+        if (calloutBox) calloutBox.dataset.status = `warn`;
+        if (calloutTitle) calloutTitle.innerHTML = `<i data-lucide="alert-triangle" aria-hidden="true"></i> 未滿 15 足歲被保險人法規限制（旅平險第 5 條）`;
+        if (calloutBody) {
+          calloutBody.innerHTML = `出發日實足 <strong>` + age + ` 歲</strong>（未滿 15 足歲）。依條款第 5 條與保險法第 107 條規定，未滿 15 足歲前身故給付變更為「喪葬費用保險金」，且各保險公司累計投保之喪葬費用總和不得超過遺產及贈與稅法第 17 條遺產稅喪葬費扣除額之半數，超過部分不負給付責任並無息退還溢繳保費。實際可投保計劃上限依當期核保規範為準。`;
+        }
+      } else if (isSenior) {
+        if (cardAge) cardAge.dataset.status = `warn`;
+        if (chipAgeBadge) {
+          chipAgeBadge.textContent = `70 歲以上高齡`;
+          chipAgeBadge.dataset.status = `warn`;
+        }
+        if (outAgeSub) {
+          outAgeSub.textContent = `適用身故/失能給付，需留意高齡計劃限額`;
+          outAgeSub.className = `kpi-caption is-warn`;
+        }
+        if (calloutBox) calloutBox.dataset.status = `warn`;
+        if (calloutTitle) calloutTitle.innerHTML = `<i data-lucide="info" aria-hidden="true"></i> 高齡被保險人投保提醒（實足 ` + age + ` 歲）`;
+        if (calloutBody) {
+          calloutBody.innerHTML = `被保險人出發日已滿 <strong>` + age + ` 歲</strong>。條款保障仍適用一般意外身故與失能保險金，但各家產險專案對於 70 歲、75 歲或 80 歲以上通常設有最高計劃數與保額限制，投保前請務必確認年齡對應之可選計劃。`;
+        }
+      } else {
+        if (cardAge) cardAge.dataset.status = `ok`;
+        if (chipAgeBadge) {
+          chipAgeBadge.textContent = `滿 15 足歲成人`;
+          chipAgeBadge.dataset.status = ``;
+        }
+        if (outAgeSub) {
+          outAgeSub.textContent = `適用完整意外身故與失能保險金`;
+          outAgeSub.className = `kpi-caption is-ok`;
+        }
+        if (calloutBox) calloutBox.dataset.status = `info`;
+        if (calloutTitle) calloutTitle.innerHTML = `<i data-lucide="check-circle-2" aria-hidden="true"></i> 年齡與主約給付條件符合（實足 ` + age + ` 歲）`;
+        if (calloutBody) {
+          calloutBody.innerHTML = `被保險人於出發日已滿 15 足歲，適用南山產物個人旅行平安保險第 5 條及第 6 條完整意外身故保險金與失能保險金給付約定（若因意外於 180 日內身故或失能，或經證明因果關係者依約給付）。`;
+        }
+      }
+
+      // Multiplier KPI
+      const outMed = document.getElementById(`out-med-limit`);
+      const outMedSub = document.getElementById(`out-med-sub`);
+      const chipRegion = document.getElementById(`chip-region-badge`);
+      const bandText = document.getElementById(`band-label-text`);
+      const barFill = document.getElementById(`multiplier-bar-fill`);
+
+      if (outMed) outMed.textContent = `NT$ ` + medLimitWan + ` 萬`;
+      if (outMedSub) outMedSub.textContent = `示範基準 ` + plan.medBaseWan + ` 萬 × ` + regionInfo.pct + `（` + regionInfo.label + `）`;
+      if (chipRegion) chipRegion.textContent = regionInfo.pct + ` 倍率`;
+      if (bandText) bandText.textContent = `目前：` + regionInfo.pct + `（` + regionInfo.label + `）`;
+      if (barFill) barFill.style.width = regionInfo.barWidth;
+
+      // Breakdown work
+      const wDates = document.getElementById(`work-dates`);
+      const wFormula = document.getElementById(`work-formula`);
+      const wAgeRule = document.getElementById(`work-age-rule`);
+      const wMedCalc = document.getElementById(`work-med-calc`);
+
+      if (wDates) wDates.textContent = appState.startDate + ` 至 ` + appState.endDate + `（共 ` + diffDays + ` 日）`;
+      if (wFormula) wFormula.textContent = formulaDesc + (isUnder15 ? ` × 未滿15歲示範調整` : ``);
+      if (wAgeRule) wAgeRule.textContent = age + ` 歲 · ` + ageFactorNote;
+      if (wMedCalc) wMedCalc.textContent = plan.medBaseWan + ` 萬 × ` + regionInfo.pct + ` = ` + medLimitWan + ` 萬`;
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function handleInputChange() {
+      const sEl = document.getElementById(`start-date`);
+      const eEl = document.getElementById(`end-date`);
+      const bEl = document.getElementById(`birth-date`);
+      const rEl = document.getElementById(`region-select`);
+
+      if (sEl) appState.startDate = sEl.value;
+      if (eEl) appState.endDate = eEl.value;
+      if (bEl) appState.birthDate = bEl.value;
+      if (rEl) appState.region = rEl.value;
+      appState.activePreset = `custom`;
+
+      syncInputsFromState();
+      calculateAndRender();
+      persistState();
+    }
+
+    function selectPlan(planNum) {
+      appState.plan = Number(planNum);
+      syncInputsFromState();
+      calculateAndRender();
+      persistState();
+    }
+
+    function applyPreset(presetKey, btn) {
+      appState.activePreset = presetKey;
+      if (presetKey === `jp-adult`) {
+        appState.startDate = `2026-12-10`;
+        appState.endDate = `2026-12-14`;
+        appState.birthDate = `1992-05-15`;
+        appState.region = `jp_kr_au_nz`;
+        appState.plan = 3;
+      } else if (presetKey === `us-adult`) {
+        appState.startDate = `2026-12-18`;
+        appState.endDate = `2026-12-27`;
+        appState.birthDate = `1988-09-22`;
+        appState.region = `us_ca_eu`;
+        appState.plan = 4;
+      } else if (presetKey === `kr-child`) {
+        appState.startDate = `2027-01-20`;
+        appState.endDate = `2027-01-23`;
+        appState.birthDate = `2015-08-10`;
+        appState.region = `jp_kr_au_nz`;
+        appState.plan = 2;
+      } else if (presetKey === `eu-senior`) {
+        appState.startDate = `2027-02-05`;
+        appState.endDate = `2027-02-16`;
+        appState.birthDate = `1954-04-03`;
+        appState.region = `us_ca_eu`;
+        appState.plan = 3;
+      }
+      syncInputsFromState();
+      calculateAndRender();
+      persistState();
+    }
+
+    function toggleRateDrawer() {
+      const drawer = document.getElementById(`custom-rate-drawer`);
+      if (!drawer) return;
+      activeRateDrawerOpen = !activeRateDrawerOpen;
+      if (activeRateDrawerOpen) {
+        drawer.classList.add(`open`);
+        syncCustomRateInputs();
+      } else {
+        drawer.classList.remove(`open`);
+      }
+    }
+
+    function updateCustomRate() {
+      const plans = getActivePlans();
+      const baseEl = document.getElementById(`custom-base-fee`);
+      const dailyEl = document.getElementById(`custom-daily-fee`);
+      const addEl = document.getElementById(`custom-add-sum`);
+      const medEl = document.getElementById(`custom-med-base`);
+
+      const pKey = String(appState.plan);
+      if (!plans[pKey]) plans[pKey] = Object.assign({}, DEFAULT_PLANS[appState.plan]);
+
+      const bVal = Number(baseEl && baseEl.value);
+      const dVal = Number(dailyEl && dailyEl.value);
+      const aVal = Number(addEl && addEl.value);
+      const mVal = Number(medEl && medEl.value);
+
+      if (bVal > 0) plans[pKey].base5 = bVal;
+      if (dVal >= 0) plans[pKey].dailyAfter5 = dVal;
+      if (aVal > 0) plans[pKey].addSumWan = aVal;
+      if (mVal > 0) plans[pKey].medBaseWan = mVal;
+
+      appState.customRates = plans;
+      for (let i = 1; i <= 5; i++) {
+        const sub = document.getElementById(`plan-sub-` + i);
+        if (sub && plans[i]) sub.textContent = plans[i].addSumWan + `萬基準`;
+      }
+      calculateAndRender();
+      persistState();
+    }
+
+    function restoreDefaultRates() {
+      appState.customRates = null;
+      syncInputsFromState();
+      calculateAndRender();
+      persistState();
+    }
+
+    function resetCalculator(btn) {
+      if (btn && btn.dataset.armed !== `true`) {
+        btn.dataset.armed = `true`;
+        btn.textContent = `再點一次確認重設`;
+        setTimeout(() => {
+          if (btn.dataset.armed === `true`) {
+            btn.dataset.armed = `false`;
+            btn.innerHTML = `<i data-lucide="rotate-ccw" aria-hidden="true"></i> 重設試算條件`;
+            if (window.lucide) window.lucide.createIcons();
+          }
+        }, 3500);
+        return;
+      }
+      if (btn) {
+        btn.dataset.armed = `false`;
+        btn.innerHTML = `<i data-lucide="rotate-ccw" aria-hidden="true"></i> 重設試算條件`;
+      }
+      appState.customRates = null;
+      applyPreset(`jp-adult`);
+    }
+
+    // Scenario Filtering & Rendering
+    function setStageFilter(stage) {
+      appState.stageFilter = stage;
+      syncInputsFromState();
+      renderScenarios();
+      persistState();
+    }
+
+    function setQuickTag(tag) {
+      appState.quickTag = tag;
+      if (tag !== `all` && tag !== `bookmarked`) {
+        appState.searchQuery = ``;
+        const s = document.getElementById(`scenario-search`);
+        if (s) s.value = ``;
+      }
+      syncInputsFromState();
+      renderScenarios();
+      persistState();
+    }
+
+    function handleSearchInput(val) {
+      appState.searchQuery = val.trim();
+      if (appState.searchQuery && appState.quickTag !== `all`) {
+        appState.quickTag = `all`;
+        syncInputsFromState();
+      }
+      renderScenarios();
+      persistState();
+    }
+
+    function clearScenarioFilters() {
+      appState.stageFilter = `all`;
+      appState.quickTag = `all`;
+      appState.searchQuery = ``;
+      syncInputsFromState();
+      renderScenarios();
+      persistState();
+    }
+
+    function toggleBookmark(id) {
+      const idx = appState.bookmarks.indexOf(id);
+      if (idx >= 0) {
+        appState.bookmarks.splice(idx, 1);
+      } else {
+        appState.bookmarks.push(id);
+      }
+      renderScenarios();
+      persistState();
+    }
+
+    function renderScenarios() {
+      const grid = document.getElementById(`scenario-grid`);
+      const countBar = document.getElementById(`scenario-count-bar`);
+      const bmChip = document.getElementById(`bookmark-counter-chip`);
+      if (!grid) return;
+
+      if (bmChip) {
+        bmChip.textContent = `已收藏 ` + appState.bookmarks.length + ` 項常用情境`;
+      }
+
+      const filtered = SCENARIOS.filter(item => {
+        if (appState.stageFilter !== `all` && item.stage !== appState.stageFilter) {
+          return false;
+        }
+        if (appState.quickTag === `bookmarked`) {
+          if (appState.bookmarks.indexOf(item.id) === -1) return false;
+        } else if (appState.quickTag !== `all`) {
+          const hay = item.title + ` ` + item.keywords + ` ` + item.summary;
+          if (!hay.includes(appState.quickTag)) return false;
+        }
+        if (appState.searchQuery) {
+          const q = appState.searchQuery.toLowerCase();
+          const fullText = (
+            item.title + ` ` + item.clause + ` ` + item.keywords + ` ` +
+            item.summary + ` ` + item.benefits.join(` `) + ` ` + item.exclusions.join(` `)
+          ).toLowerCase();
+          if (!fullText.includes(q)) return false;
+        }
+        return true;
+      });
+
+      if (countBar) {
+        countBar.textContent = `顯示 ` + filtered.length + ` / ` + SCENARIOS.length + ` 筆理賠情境`;
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <h3 class="panel-title">找不到符合條件的理賠情境</h3>
+            <p class="section-desc" style="margin-bottom: var(--space-md);">
+              目前的階段篩選與關鍵字組合沒有對應項目。請清除篩選條件，或改搜尋「暴動」、「罷工」、「颱風」、「機件」、「住宿」等常見關鍵字。
+            </p>
+            <button type="button" class="btn btn-primary btn-sm" onclick="clearScenarioFilters()">重設所有理賠篩選</button>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const isBookmarked = appState.bookmarks.indexOf(item.id) >= 0;
+        const chipStatusAttr = item.status === `ok` ? `` : ` data-status="` + item.status + `"`;
+        const benefitsHtml = item.benefits.map(b => `<li>` + b + `</li>`).join(``);
+        const exclusionsHtml = item.exclusions.map(e => `<li>` + e + `</li>`).join(``);
+
+        return `
+          <article class="scenario-card" data-status="` + item.status + `">
+            <div class="scenario-top">
+              <div>
+                <h3 class="scenario-title">` + item.title + `</h3>
+                <span class="scenario-clause">` + item.clause + `</span>
+              </div>
+              <span class="chip"` + chipStatusAttr + `>` + item.statusText + `</span>
+            </div>
+
+            <p class="scenario-summary">` + item.summary + `</p>
+
+            <div class="scenario-block">
+              <p class="scenario-block-title">
+                <i data-lucide="check-circle" aria-hidden="true"></i>
+                可申請項目與計算標準
+              </p>
+              <ul class="scenario-list">` + benefitsHtml + `</ul>
+            </div>
+
+            <div class="scenario-block scenario-block-alert">
+              <p class="scenario-block-title">
+                <i data-lucide="alert-octagon" aria-hidden="true"></i>
+                除外與特別不保地雷
+              </p>
+              <ul class="scenario-list">` + exclusionsHtml + `</ul>
+            </div>
+
+            <div class="scenario-footer">
+              <span class="field-hint" style="flex: 1 1 220px;"><strong>必備文件：</strong>` + item.docs + `</span>
+              <button type="button" class="bookmark-btn" aria-pressed="` + (isBookmarked ? `true` : `false`) + `" onclick="toggleBookmark('` + item.id + `')">
+                <i data-lucide="` + (isBookmarked ? `bookmark-check` : `bookmark`) + `" aria-hidden="true"></i>
+                ` + (isBookmarked ? `已收藏` : `收藏情境`) + `
+              </button>
+            </div>
+          </article>
+        `;
+      }).join(``);
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    async function persistState() {
+      const noteEl = document.getElementById(`saved-status-note`);
+      if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === `function`) {
+        try {
+          await window.notebookAppApi.setAppState(appState);
+          if (noteEl) noteEl.textContent = `已儲存您的試算設定與收藏情境。`;
+        } catch (err) {
+          // Graceful fallback if state exceeds or fails
+        }
+      }
+    }
+
+    async function initApp() {
+      if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === `function`) {
+        try {
+          const saved = await window.notebookAppApi.getAppState();
+          if (saved && typeof saved === `object`) {
+            appState = Object.assign({}, appState, saved);
+            if (!Array.isArray(appState.bookmarks)) appState.bookmarks = [];
+          }
+        } catch (err) {
+          // Use defaults
+        }
+      }
+
+      syncInputsFromState();
+      calculateAndRender();
+      renderScenarios();
+
+      if (window.lucide) window.lucide.createIcons();
+      if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === `function`) {
+        window.notebookAppApi.notifyAppReady();
+      }
+    }
+
+    document.addEventListener(`DOMContentLoaded`, initApp);
+  </script>
+</body>
+</html>
